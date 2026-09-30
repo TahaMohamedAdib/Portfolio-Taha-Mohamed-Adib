@@ -10,6 +10,11 @@ python -m http.server 8000
 
 Then visit `http://localhost:8000`.
 
-The three projects include interactive case studies. Their visuals are conceptual illustrations with demonstration data; the experience, technologies, and project descriptions come from the supplied CV. The original portrait and a downloadable CV are in `assets/`.
+The four projects include accessible case-study dialogs: OraSight, SafeSpend, HR email automation at Yool Education, and a retail operations platform. Product visuals are illustrative; experience, technologies, education, and certifications are based on the supplied CV. The original portrait, downloadable CV, and social preview are in `assets/`.
 
 To update the site, edit content and links in `index.html`, visual styles in `styles.css`, and interactions in `script.js`.
+
+Case-study content lives in the `projects` object in `script.js`. The site includes keyboard navigation, reduced-motion support, and a readable no-JavaScript fallback. No build step is required. Local QA artifacts and browser profiles in `tmp/` are excluded from version control.
+
+GitHub Pages automatically publishes the repository root from `main`:
+https://tahamohamedadib.github.io/Portfolio-Taha-Mohamed-Adib/
