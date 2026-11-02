@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f4f2ec" />
+    <meta name="theme-color" content="#07080c" />
     <meta
       name="description"
       content="Taha Mohamed Adib — final-year software engineering student specializing in Data Science & AI. Explore shipped products, intelligent automation, and the systems behind them."
@@ -41,10 +41,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <script>
+      // Opt into load animations before first paint; reduced-motion users get the static page.
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches)
+        document.documentElement.classList.add("motion");
+    </script>
     <script defer src="./script.js"></script>
   </head>
   <body>
@@ -87,6 +92,7 @@
     </nav>
     <main id="main">
       <section class="hero shell" id="top" aria-labelledby="hero-title">
+        <canvas class="hero-field" aria-hidden="true"></canvas>
         <div class="hero-meta">
           <p class="eyebrow">
             <span class="status-dot"></span> Open for a PFE internship · Jan /
@@ -99,7 +105,11 @@
         <div class="hero-grid">
           <div class="hero-copy">
             <p class="eyebrow blue">SOFTWARE ENGINEERING × DATA & AI</p>
-            <h1 id="hero-title">Complexity.<br /><em>Meet clarity.</em></h1>
+            <h1 id="hero-title" aria-label="Complexity. Meet clarity.">
+              <span class="line"
+                ><span class="line-inner" data-scramble>Complexity.</span></span
+              ><span class="line"><em class="line-inner">Meet clarity.</em></span>
+            </h1>
             <p class="hero-intro">
               I’m Taha. I turn complex problems into<br class="desktop-break" />
               intelligent software that people can use.
@@ -147,28 +157,83 @@
                   </radialGradient>
                 </defs>
                 <path class="axis-line" d="M40 230H480M260 35V425" />
-                <circle class="outer-orbit" cx="260" cy="230" r="185" />
-                <ellipse
-                  class="outer-orbit"
-                  cx="260"
-                  cy="230"
-                  rx="221"
-                  ry="89"
-                  transform="rotate(-35 260 230)"
-                />
-                <ellipse
-                  class="outer-orbit"
-                  cx="260"
-                  cy="230"
-                  rx="221"
-                  ry="89"
-                  transform="rotate(35 260 230)"
-                />
+                <g class="orbit-spin">
+                  <circle class="outer-orbit" cx="260" cy="230" r="185" />
+                  <g transform="rotate(-35 260 230)">
+                    <path
+                      id="orbit-a"
+                      class="outer-orbit"
+                      d="M39 230a221 89 0 1 0 442 0a221 89 0 1 0-442 0"
+                    />
+                    <circle r="4.5" fill="#2550ef">
+                      <animateMotion dur="14s" repeatCount="indefinite">
+                        <mpath href="#orbit-a" />
+                      </animateMotion>
+                    </circle>
+                  </g>
+                  <g transform="rotate(35 260 230)">
+                    <path
+                      id="orbit-b"
+                      class="outer-orbit"
+                      d="M39 230a221 89 0 1 0 442 0a221 89 0 1 0-442 0"
+                    />
+                    <circle
+                      r="4"
+                      fill="#07080c"
+                      stroke="#2550ef"
+                      stroke-width="2"
+                    >
+                      <animateMotion
+                        dur="19s"
+                        begin="-7s"
+                        repeatCount="indefinite"
+                        keyPoints="1;0"
+                        keyTimes="0;1"
+                        calcMode="linear"
+                      >
+                        <mpath href="#orbit-b" />
+                      </animateMotion>
+                    </circle>
+                  </g>
+                </g>
                 <circle cx="260" cy="230" r="119" fill="url(#orb-fill)" />
                 <circle cx="222" cy="185" r="85" fill="url(#orb-shine)" />
                 <g stroke="#e4ebff" stroke-opacity=".4">
-                  <ellipse cx="260" cy="230" rx="46" ry="119" />
-                  <ellipse cx="260" cy="230" rx="88" ry="119" />
+                  <ellipse cx="260" cy="230" rx="46" ry="119">
+                    <animate
+                      attributeName="rx"
+                      values="119;0;119"
+                      keyTimes="0;.5;1"
+                      calcMode="spline"
+                      keySplines=".5 0 1 1;0 0 .5 1"
+                      dur="9s"
+                      repeatCount="indefinite"
+                    />
+                  </ellipse>
+                  <ellipse cx="260" cy="230" rx="88" ry="119">
+                    <animate
+                      attributeName="rx"
+                      values="119;0;119"
+                      keyTimes="0;.5;1"
+                      calcMode="spline"
+                      keySplines=".5 0 1 1;0 0 .5 1"
+                      dur="9s"
+                      begin="-3s"
+                      repeatCount="indefinite"
+                    />
+                  </ellipse>
+                  <ellipse cx="260" cy="230" rx="88" ry="119">
+                    <animate
+                      attributeName="rx"
+                      values="119;0;119"
+                      keyTimes="0;.5;1"
+                      calcMode="spline"
+                      keySplines=".5 0 1 1;0 0 .5 1"
+                      dur="9s"
+                      begin="-6s"
+                      repeatCount="indefinite"
+                    />
+                  </ellipse>
                   <ellipse cx="260" cy="230" rx="119" ry="45" />
                   <ellipse cx="260" cy="230" rx="119" ry="88" />
                   <path d="M141 230H379M260 111V349" />
@@ -179,7 +244,7 @@
                   cx="406"
                   cy="118"
                   r="5"
-                  fill="#f4f2ec"
+                  fill="#07080c"
                   stroke="#2550ef"
                   stroke-width="2"
                 />
@@ -288,7 +353,8 @@
                     Good questions.<br /><span>Better decisions.</span>
                   </p>
                   <div class="query">
-                    How are our sales trending?<span>↑</span>
+                    <span class="query-text">How are our sales trending?</span
+                    ><span class="query-send">↑</span>
                   </div>
                   <div class="answer">
                     <p>
@@ -349,14 +415,18 @@
                   ><strong>4,500 <small>MAD</small></strong>
                   <div class="budget-track"><i></i></div>
                   <div class="budget-label">
-                    <span>Spent · 2,700</span><span>60%</span>
+                    <span>Spent · <span data-count="2700">2,700</span></span
+                    ><span><span data-count="60">60</span>%</span>
                   </div>
                 </div>
                 <div class="savings">
                   <span>↗</span>
                   <div>
                     <strong>The next adventure</strong
-                    ><small>Savings goal · 72% complete</small>
+                    ><small
+                      >Savings goal · <span data-count="72">72</span>%
+                      complete</small
+                    >
                   </div>
                 </div>
                 <div class="phone-nav">
@@ -748,7 +818,8 @@
               A good conversation<br />can build<br /><em>something great.</em>
             </h2>
             <a class="contact-email" href="mailto:tahamohamedadib@gmail.com"
-              >tahamohamedadib@gmail.com <span aria-hidden="true">↗</span></a
+              ><span class="scramble-text">tahamohamedadib@gmail.com</span>
+              <span aria-hidden="true">↗</span></a
             ><button class="copy-email" type="button" hidden>
               Copy email <span aria-hidden="true">⧉</span></button
             ><span id="copy-status" class="copy-status" role="status"></span>

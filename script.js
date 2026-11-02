@@ -231,6 +231,9 @@ document.querySelectorAll("[data-case]").forEach((trigger) =>
     if (!project) return;
     // These values are static, authored content; no user input is interpolated.
     dialogContent.innerHTML = `<div class="dialog-body"><p class="eyebrow">${project.eyebrow}</p><h2 id="dialog-title">${project.title}</h2><p class="dialog-deck">${project.deck}</p><div class="dialog-meta"><div><span>MY ROLE</span><strong>${project.role}</strong></div><div><span>CONTEXT</span><strong>${project.context}</strong></div><div><span>CORE STACK</span><strong>${project.stack}</strong></div></div>${project.sections.map(([title, text]) => `<section class="dialog-section"><h3>${title}</h3><p>${text}</p></section>`).join("")}<div class="dialog-flow">${project.flow.map(([title, text], index) => `<div><span>0${index + 1}</span><strong>${title}</strong><small>${text}</small></div>`).join("")}</div><div class="dialog-footer"><p>Want to talk through the decisions behind it?</p><a href="mailto:tahamohamedadib@gmail.com?subject=${encodeURIComponent(`Let’s talk about ${project.title}`)}">Let’s discuss the project <span aria-hidden="true">↗</span></a></div></div>`;
+    [...dialogContent.firstElementChild.children].forEach((child, index) =>
+      child.style.setProperty("--i", index),
+    );
     opener = trigger;
     dialog.showModal();
     dialog.scrollTop = 0;
@@ -272,3 +275,525 @@ copyButton.addEventListener("click", async () => {
     copyStatus.textContent = "";
   }, 4000);
 });
+
+/* ------------------------------------------------------------------
+   Motion layer. Everything below is progressive enhancement: the page is
+   complete without it, and it never starts under prefers-reduced-motion.
+   Switching to reduced motion mid-visit settles every effect in its final
+   state; switching back takes effect on the next load.
+------------------------------------------------------------------- */
+const root = document.documentElement;
+const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+const lerp = (from, to, amount) => from + (to - from) * amount;
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+const settlers = [];
+
+// One shared frame loop: each job returns true while it still needs frames.
+const jobs = new Set();
+let ticking = false;
+function tick(now) {
+  jobs.forEach((job) => job(now) || jobs.delete(job));
+  ticking = jobs.size > 0;
+  if (ticking) requestAnimationFrame(tick);
+}
+function schedule(job) {
+  jobs.add(job);
+  if (!ticking) {
+    ticking = true;
+    requestAnimationFrame(tick);
+  }
+}
+
+const glyphs = "abcdefghijklmnopqrstuvwxyz0123456789#%*+=/";
+function scramble(element, duration) {
+  const text = (element.dataset.text ??= element.textContent);
+  const start = performance.now();
+  // Characters resolve left to right; the authored text contains no markup.
+  schedule(function frame(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const fixed = Math.floor(progress * text.length);
+    let tail = "";
+    for (const char of text.slice(fixed))
+      tail += /[\s@.]/.test(char)
+        ? char
+        : glyphs[(Math.random() * glyphs.length) | 0];
+    element.innerHTML =
+      text.slice(0, fixed) +
+      (tail ? `<span class="scramble-glyphs">${tail}</span>` : "");
+    if (progress < 1) return true;
+    element.textContent = text;
+    return false;
+  });
+}
+
+function splitLines(heading) {
+  let openEm = 0;
+  const lines = heading.innerHTML.split(/<br\s*\/?>/i).map((part) => {
+    let html = (openEm ? "<em>" : "") + part.trim();
+    openEm +=
+      (part.match(/<em\b/g) || []).length -
+      (part.match(/<\/em>/g) || []).length;
+    if (openEm) html += "</em>";
+    return html;
+  });
+  heading.innerHTML = lines
+    .map(
+      (html, index) =>
+        `<span class="split-line"><span class="line-inner" style="--line:${index}">${html}</span></span>`,
+    )
+    .join("");
+  heading.classList.add("split");
+}
+
+function countUp(element) {
+  const end = Number(element.dataset.count);
+  const start = performance.now();
+  schedule((now) => {
+    const progress = Math.min((now - start) / 1400, 1);
+    element.textContent = Math.round(
+      end * (1 - (1 - progress) ** 3),
+    ).toLocaleString("en-US");
+    return progress < 1;
+  });
+}
+
+function heroField() {
+  const hero = document.querySelector(".hero");
+  const canvas = hero.querySelector(".hero-field");
+  const art = hero.querySelector(".system-art");
+  const orbit = hero.querySelector(".orbit-svg");
+  const context = canvas.getContext("2d");
+  const reach = 190;
+  const synapse = 125;
+  const pointer = { x: null, y: null, targetX: 0, targetY: 0, live: false };
+  const ripples = [];
+  let nodes = [];
+  let width = 0;
+  let height = 0;
+  let artBox = { x: 0, y: 0, size: 1 };
+  let visible = true;
+
+  function resize() {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const heroRect = hero.getBoundingClientRect();
+    const artRect = art.getBoundingClientRect();
+    width = hero.clientWidth;
+    height = hero.clientHeight;
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    artBox = {
+      x: artRect.left - heroRect.left + artRect.width / 2,
+      y: artRect.top - heroRect.top + artRect.height / 2,
+      size: Math.max(artRect.width, 1),
+    };
+    nodes = Array.from({ length: Math.round((width * height) / 5200) }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.2 + Math.random() * 0.5,
+      size: Math.random() < 0.12 ? 1.8 : 1.1,
+    }));
+  }
+
+  function frame(now) {
+    if (!visible) return false;
+    const seconds = now / 1000;
+    // A slow "ghost" pointer keeps the field alive on touch screens and idle desktops.
+    if (!pointer.live) {
+      pointer.targetX =
+        artBox.x + artBox.size * 0.38 * Math.sin(seconds * 0.37);
+      pointer.targetY =
+        artBox.y + artBox.size * 0.3 * Math.sin(seconds * 0.53 + 1);
+    }
+    pointer.x =
+      pointer.x === null ? pointer.targetX : lerp(pointer.x, pointer.targetX, 0.1);
+    pointer.y =
+      pointer.y === null ? pointer.targetY : lerp(pointer.y, pointer.targetY, 0.1);
+
+    ripples.forEach((ripple) => {
+      ripple.radius += 7;
+      ripple.strength *= 0.965;
+    });
+    while (ripples.length && ripples[0].strength < 0.03) ripples.shift();
+
+    // Neurons drift in place; near the pointer (or a click ripple) they light up and wire together.
+    context.clearRect(0, 0, width, height);
+    const lit = [];
+    for (const node of nodes) {
+      let x = node.x + Math.sin(seconds * node.speed + node.phase) * 6;
+      let y = node.y + Math.cos(seconds * node.speed * 0.8 + node.phase) * 6;
+      const dx = x - pointer.x;
+      const dy = y - pointer.y;
+      const distance = Math.hypot(dx, dy) || 1;
+      let energy = 0;
+      if (distance < reach) {
+        energy = 1 - distance / reach;
+        x -= (dx / distance) * energy * energy * 10;
+        y -= (dy / distance) * energy * energy * 10;
+      }
+      for (const ripple of ripples) {
+        const rx = node.x - ripple.x;
+        const ry = node.y - ripple.y;
+        const span = Math.hypot(rx, ry) || 1;
+        const band = Math.abs(span - ripple.radius);
+        if (band < 40) {
+          const push = (1 - band / 40) * ripple.strength;
+          x += (rx / span) * push * 12;
+          y += (ry / span) * push * 12;
+          energy += push;
+        }
+      }
+      node.screenX = x;
+      node.screenY = y;
+      node.energy = Math.min(energy, 1);
+      if (node.energy > 0.05) lit.push(node);
+      context.globalAlpha = 0.2 + node.energy * 0.75;
+      context.fillStyle = node.energy > 0.05 ? "#a9baff" : "#c8cfe0";
+      context.beginPath();
+      context.arc(x, y, node.size + node.energy * 1.8, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.strokeStyle = "#8aa2ff";
+    context.lineWidth = 1;
+    for (let a = 0; a < lit.length; a++)
+      for (let b = a + 1; b < lit.length; b++) {
+        const from = lit[a];
+        const to = lit[b];
+        const gap = Math.hypot(from.screenX - to.screenX, from.screenY - to.screenY);
+        if (gap > synapse) continue;
+        context.globalAlpha =
+          (1 - gap / synapse) * Math.min(from.energy, to.energy) * 0.9;
+        context.beginPath();
+        context.moveTo(from.screenX, from.screenY);
+        context.lineTo(to.screenX, to.screenY);
+        context.stroke();
+      }
+    context.globalAlpha = 1;
+
+    // The orb leans toward the (real or ghost) pointer, its tags at different depths.
+    const nx = clamp((pointer.x - artBox.x) / artBox.size, -1, 1);
+    const ny = clamp((pointer.y - artBox.y) / artBox.size, -1, 1);
+    art.style.setProperty("--tilt-x", `${(-ny * 12).toFixed(2)}deg`);
+    art.style.setProperty("--tilt-y", `${(nx * 16).toFixed(2)}deg`);
+    art.style.setProperty("--px", nx.toFixed(3));
+    art.style.setProperty("--py", ny.toFixed(3));
+    art.classList.toggle("is-near", pointer.live && Math.hypot(nx, ny) < 0.45);
+    return true;
+  }
+
+  function localPoint(event) {
+    const rect = hero.getBoundingClientRect();
+    return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+  }
+  hero.addEventListener("pointermove", (event) => {
+    if (event.pointerType === "touch") return;
+    const point = localPoint(event);
+    pointer.targetX = point.x;
+    pointer.targetY = point.y;
+    pointer.live = true;
+  });
+  hero.addEventListener("pointerleave", () => (pointer.live = false));
+  hero.addEventListener("pointerdown", (event) => {
+    const point = localPoint(event);
+    ripples.push({ ...point, radius: 0, strength: 1 });
+    if (ripples.length > 4) ripples.shift();
+  });
+
+  new ResizeObserver(resize).observe(hero);
+  resize();
+  new IntersectionObserver(([entry]) => {
+    visible = entry.isIntersecting && !document.hidden;
+    art.classList.toggle("in-view", visible);
+    if (visible) {
+      orbit.unpauseAnimations();
+      schedule(frame);
+    } else orbit.pauseAnimations();
+  }).observe(hero);
+  document.addEventListener("visibilitychange", () => {
+    visible = !document.hidden && hero.getBoundingClientRect().bottom > 0;
+    if (visible) schedule(frame);
+  });
+
+  settlers.push(() => {
+    visible = false;
+    context.clearRect(0, 0, width, height);
+    orbit.pauseAnimations();
+  });
+}
+
+function oraDemo() {
+  const area = document.querySelector(".ora-art");
+  const app = area.querySelector(".ora-app");
+  const query = app.querySelector(".query-text");
+  const question = query.textContent;
+  const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG"];
+  let timer;
+  app.querySelectorAll(".chart > span").forEach((bar, index) => {
+    bar.style.setProperty("--i", index);
+    bar.dataset.v = `${months[index]} · ${bar.style.getPropertyValue("--h").trim()}`;
+  });
+  query.textContent = "";
+
+  function play() {
+    clearTimeout(timer);
+    app.classList.remove("is-answered", "is-sending");
+    query.textContent = "";
+    let typed = 0;
+    const type = () => {
+      query.textContent = question.slice(0, ++typed);
+      if (typed < question.length)
+        timer = setTimeout(type, 34 + Math.random() * 46);
+      else
+        timer = setTimeout(() => {
+          app.classList.add("is-sending");
+          timer = setTimeout(() => {
+            app.classList.remove("is-sending");
+            app.classList.add("is-answered");
+          }, 260);
+        }, 320);
+    };
+    timer = setTimeout(type, 350);
+  }
+  new IntersectionObserver(
+    ([entry]) => {
+      area.classList.toggle("in-view", entry.isIntersecting);
+      if (entry.isIntersecting) play();
+    },
+    { threshold: 0.45 },
+  ).observe(area);
+
+  settlers.push(() => {
+    clearTimeout(timer);
+    query.textContent = question;
+    app.classList.add("is-answered");
+  });
+}
+
+function observeOnce(elements, onEnter, options) {
+  const observer = new IntersectionObserver(
+    (entries) =>
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("in-view");
+        onEnter?.(entry.target);
+        observer.unobserve(entry.target);
+      }),
+    options,
+  );
+  elements.forEach((element) => observer.observe(element));
+}
+
+function pointerEffects() {
+  // Pointer-relative parallax inside the product illustrations.
+  document.querySelectorAll(".ora-art, .safespend-art").forEach((area) => {
+    area.addEventListener("pointermove", (event) => {
+      const rect = area.getBoundingClientRect();
+      const nx = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = ((event.clientY - rect.top) / rect.height) * 2 - 1;
+      area.style.setProperty("--px", nx.toFixed(3));
+      area.style.setProperty("--py", ny.toFixed(3));
+      area.style.setProperty("--ty", `${(nx * 7).toFixed(2)}deg`);
+      area.style.setProperty("--tx", `${(-ny * 6).toFixed(2)}deg`);
+    });
+    area.addEventListener("pointerleave", () =>
+      ["--px", "--py", "--tx", "--ty"].forEach((name) =>
+        area.style.removeProperty(name),
+      ),
+    );
+  });
+
+  document
+    .querySelectorAll(
+      ".featured-project, .project-card, .operations-project, .toolkit-grid > article, .availability, .timeline-item",
+    )
+    .forEach((card) => {
+      card.classList.add("spotlight");
+      card.addEventListener("pointermove", (event) => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty("--sx", `${event.clientX - rect.left}px`);
+        card.style.setProperty("--sy", `${event.clientY - rect.top}px`);
+      });
+    });
+
+  // Magnetic calls to action drift toward the pointer, then spring back.
+  document
+    .querySelectorAll(".button, .header-contact, .case-trigger, .copy-email")
+    .forEach((magnet) => {
+      const state = { x: 0, y: 0, targetX: 0, targetY: 0 };
+      const settle = () => {
+        state.x = lerp(state.x, state.targetX, 0.18);
+        state.y = lerp(state.y, state.targetY, 0.18);
+        const moving =
+          Math.abs(state.x - state.targetX) > 0.05 ||
+          Math.abs(state.y - state.targetY) > 0.05;
+        magnet.style.translate = moving || state.targetX || state.targetY
+          ? `${state.x.toFixed(2)}px ${state.y.toFixed(2)}px`
+          : "";
+        return moving;
+      };
+      magnet.addEventListener("pointermove", (event) => {
+        const rect = magnet.getBoundingClientRect();
+        state.targetX = clamp(
+          (event.clientX - rect.left - rect.width / 2) * 0.25,
+          -10,
+          10,
+        );
+        state.targetY = clamp(
+          (event.clientY - rect.top - rect.height / 2) * 0.35,
+          -8,
+          8,
+        );
+        schedule(settle);
+      });
+      magnet.addEventListener("pointerleave", () => {
+        state.targetX = 0;
+        state.targetY = 0;
+        schedule(settle);
+      });
+    });
+
+  const cursor = document.createElement("div");
+  cursor.className = "cursor";
+  cursor.setAttribute("aria-hidden", "true");
+  const light = document.createElement("div");
+  light.className = "cursor-glow";
+  light.setAttribute("aria-hidden", "true");
+  document.body.append(cursor, light);
+  const ring = { x: 0, y: 0, targetX: 0, targetY: 0, placed: false };
+  const glow = { x: 0, y: 0 };
+  const follow = () => {
+    ring.x = lerp(ring.x, ring.targetX, 0.22);
+    ring.y = lerp(ring.y, ring.targetY, 0.22);
+    glow.x = lerp(glow.x, ring.targetX, 0.08);
+    glow.y = lerp(glow.y, ring.targetY, 0.08);
+    cursor.style.transform = `translate3d(${ring.x.toFixed(1)}px, ${ring.y.toFixed(1)}px, 0)`;
+    light.style.transform = `translate3d(${glow.x.toFixed(1)}px, ${glow.y.toFixed(1)}px, 0)`;
+    return (
+      Math.abs(glow.x - ring.targetX) > 0.1 ||
+      Math.abs(glow.y - ring.targetY) > 0.1
+    );
+  };
+  document.addEventListener("pointermove", (event) => {
+    if (event.pointerType !== "mouse") return;
+    ring.targetX = event.clientX;
+    ring.targetY = event.clientY;
+    if (!ring.placed) {
+      ring.x = ring.targetX;
+      ring.y = ring.targetY;
+      glow.x = ring.targetX;
+      glow.y = ring.targetY;
+      ring.placed = true;
+    }
+    cursor.classList.add("is-visible");
+    light.classList.add("is-visible");
+    cursor.classList.toggle(
+      "is-hovering",
+      Boolean(event.target.closest("a, button, .chart > span")),
+    );
+    schedule(follow);
+  });
+  document.addEventListener("pointerdown", () =>
+    cursor.classList.add("is-pressed"),
+  );
+  document.addEventListener("pointerup", () =>
+    cursor.classList.remove("is-pressed"),
+  );
+  document.addEventListener("mouseout", (event) => {
+    if (!event.relatedTarget) {
+      cursor.classList.remove("is-visible");
+      light.classList.remove("is-visible");
+    }
+  });
+  settlers.push(() => {
+    cursor.remove();
+    light.remove();
+  });
+}
+
+if (!reducedMotion.matches) {
+  root.classList.add("motion", "motion-ready");
+
+  const headline = document.querySelector(".hero h1 [data-scramble]");
+  setTimeout(() => scramble(headline, 1100), 250);
+
+  document
+    .querySelectorAll(
+      ".section-heading h2, .about-copy h2, .contact h2, .ops-copy h3, .education-grid h3",
+    )
+    .forEach(splitLines);
+  observeOnce(document.querySelectorAll(".split, .timeline-item"), null, {
+    rootMargin: "0px 0px -12% 0px",
+  });
+
+  const counters = [...document.querySelectorAll("[data-count]")];
+  counters.forEach((counter) => (counter.textContent = "0"));
+  observeOnce(
+    document.querySelectorAll(".safespend-art"),
+    (area) => area.querySelectorAll("[data-count]").forEach(countUp),
+    { threshold: 0.4 },
+  );
+  settlers.push(() =>
+    counters.forEach(
+      (counter) =>
+        (counter.textContent = Number(counter.dataset.count).toLocaleString(
+          "en-US",
+        )),
+    ),
+  );
+
+  // Looping illustrations only animate while on screen.
+  const loops = new IntersectionObserver((entries) =>
+    entries.forEach((entry) =>
+      entry.target.classList.toggle("in-view", entry.isIntersecting),
+    ),
+  );
+  document
+    .querySelectorAll(".automation-art, .ops-visual")
+    .forEach((visual) => loops.observe(visual));
+
+  heroField();
+  oraDemo();
+  if (finePointer.matches) pointerEffects();
+
+  const email = document.querySelector(".contact-email");
+  const emailText = email.querySelector(".scramble-text");
+  ["pointerenter", "focus"].forEach((type) =>
+    email.addEventListener(type, () => {
+      if (!reducedMotion.matches) scramble(emailText, 700);
+    }),
+  );
+
+  reducedMotion.addEventListener("change", (event) => {
+    if (!event.matches) return;
+    root.classList.remove("motion", "motion-ready");
+    jobs.clear();
+    settlers.forEach((settle) => settle());
+  });
+} else document.querySelector(".orbit-svg").pauseAnimations();
+
+// The header steps aside while reading down and returns on the way back up.
+let lastScrollY = window.scrollY;
+window.addEventListener(
+  "scroll",
+  () => {
+    const y = window.scrollY;
+    if (Math.abs(y - lastScrollY) < 6) return;
+    header.classList.toggle(
+      "is-tucked",
+      y > lastScrollY &&
+        y > 400 &&
+        !document.body.classList.contains("menu-open") &&
+        !header.contains(document.activeElement),
+    );
+    lastScrollY = y;
+  },
+  { passive: true },
+);
+header.addEventListener("focusin", () => header.classList.remove("is-tucked"));
+
+console.log(
+  "%cta✳ Hi there, fellow builder.%c\nCurious how this was made? tahamohamedadib@gmail.com",
+  "font: 600 16px Space Grotesk, sans-serif; color: #6f8cff",
+  "font: 12px DM Mono, monospace; color: #9ba3b4",
+);
