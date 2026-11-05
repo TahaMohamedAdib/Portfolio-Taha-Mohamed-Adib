@@ -140,9 +140,9 @@ const projects = {
       ["Explore", "Insight in the web application"],
     ],
   },
-  safespend: {
+  vvollet: {
     eyebrow: "02 / PUBLISHED MOBILE PRODUCT",
-    title: "SafeSpend.",
+    title: "VVollet.",
     deck: "A clearer view of everyday spending—and the goals beyond it.",
     role: "End-to-end product builder",
     context: "Google Play · 2025",
@@ -154,7 +154,7 @@ const projects = {
       ],
       [
         "02 / MY CONTRIBUTION",
-        "I designed, developed, and published SafeSpend. My role covered the full lifecycle, from the interface and application logic to Google Play submission and post-release updates.",
+        "I designed, developed, and published VVollet. My role covered the full lifecycle, from the interface and application logic to Google Play submission and post-release updates.",
       ],
       [
         "03 / THE ENGINEERING",
@@ -165,6 +165,18 @@ const projects = {
       ["Track", "Expenses and categories"],
       ["Organize", "Budgets and personal goals"],
       ["Protect", "Authentication + isolated data"],
+    ],
+    gallery: [
+      ["home-dark", "Home: total balance and balance over time"],
+      ["actions-dark", "Quick actions: expense, income, withdraw, transfer"],
+      ["budgets-dark", "Budgets: monthly limits by category"],
+      ["wealth-dark", "Wealth: net worth, income, and debt"],
+      ["onboarding-glance", "Onboarding: everything at a glance"],
+      ["onboarding-budgets", "Onboarding: plan with budgets"],
+      ["onboarding-wealth", "Onboarding: grow your wealth"],
+      ["home-light", "Home in light mode"],
+      ["budgets-light", "Budgets in light mode"],
+      ["wealth-light", "Wealth in light mode"],
     ],
   },
   automation: {
@@ -230,7 +242,7 @@ document.querySelectorAll("[data-case]").forEach((trigger) =>
     const project = projects[trigger.dataset.case];
     if (!project) return;
     // These values are static, authored content; no user input is interpolated.
-    dialogContent.innerHTML = `<div class="dialog-body"><p class="eyebrow">${project.eyebrow}</p><h2 id="dialog-title">${project.title}</h2><p class="dialog-deck">${project.deck}</p><div class="dialog-meta"><div><span>MY ROLE</span><strong>${project.role}</strong></div><div><span>CONTEXT</span><strong>${project.context}</strong></div><div><span>CORE STACK</span><strong>${project.stack}</strong></div></div>${project.sections.map(([title, text]) => `<section class="dialog-section"><h3>${title}</h3><p>${text}</p></section>`).join("")}<div class="dialog-flow">${project.flow.map(([title, text], index) => `<div><span>0${index + 1}</span><strong>${title}</strong><small>${text}</small></div>`).join("")}</div><div class="dialog-footer"><p>Want to talk through the decisions behind it?</p><a href="mailto:tahamohamedadib@gmail.com?subject=${encodeURIComponent(`Let’s talk about ${project.title}`)}">Let’s discuss the project <span aria-hidden="true">↗</span></a></div></div>`;
+    dialogContent.innerHTML = `<div class="dialog-body"><p class="eyebrow">${project.eyebrow}</p><h2 id="dialog-title">${project.title}</h2><p class="dialog-deck">${project.deck}</p><div class="dialog-meta"><div><span>MY ROLE</span><strong>${project.role}</strong></div><div><span>CONTEXT</span><strong>${project.context}</strong></div><div><span>CORE STACK</span><strong>${project.stack}</strong></div></div>${project.gallery ? `<div class="dialog-gallery" role="region" aria-label="App screenshots" tabindex="0">${project.gallery.map(([file, caption]) => `<figure><img src="./assets/vvollet/${file}.webp" alt="${caption}" width="540" height="1176" loading="lazy" decoding="async" /><figcaption>${caption}</figcaption></figure>`).join("")}</div>` : ""}${project.sections.map(([title, text]) => `<section class="dialog-section"><h3>${title}</h3><p>${text}</p></section>`).join("")}<div class="dialog-flow">${project.flow.map(([title, text], index) => `<div><span>0${index + 1}</span><strong>${title}</strong><small>${text}</small></div>`).join("")}</div><div class="dialog-footer"><p>Want to talk through the decisions behind it?</p><a href="mailto:tahamohamedadib@gmail.com?subject=${encodeURIComponent(`Let’s talk about ${project.title}`)}">Let’s discuss the project <span aria-hidden="true">↗</span></a></div></div>`;
     [...dialogContent.firstElementChild.children].forEach((child, index) =>
       child.style.setProperty("--i", index),
     );
@@ -257,6 +269,24 @@ dialog.addEventListener("click", (event) => {
 dialog.addEventListener("close", () => {
   document.body.classList.remove("modal-open");
   opener?.focus();
+});
+
+// VVollet ships light and dark themes; the switch swaps the real screenshots.
+const vvolletArt = document.querySelector(".vvollet-art");
+const themeSwitch = vvolletArt.querySelector(".theme-switch");
+const appShots = [...vvolletArt.querySelectorAll(".app-shot")];
+const preloadLight = () =>
+  appShots.forEach((shot) => (new Image().src = shot.dataset.light));
+vvolletArt.addEventListener("pointerenter", preloadLight, { once: true });
+themeSwitch.addEventListener("focus", preloadLight, { once: true });
+themeSwitch.hidden = false;
+themeSwitch.addEventListener("click", () => {
+  const light = themeSwitch.getAttribute("aria-pressed") !== "true";
+  themeSwitch.setAttribute("aria-pressed", String(light));
+  vvolletArt.dataset.theme = light ? "light" : "dark";
+  appShots.forEach((shot) => {
+    shot.src = light ? shot.dataset.light : shot.dataset.dark;
+  });
 });
 
 const copyButton = document.querySelector(".copy-email");
@@ -343,18 +373,6 @@ function splitLines(heading) {
     )
     .join("");
   heading.classList.add("split");
-}
-
-function countUp(element) {
-  const end = Number(element.dataset.count);
-  const start = performance.now();
-  schedule((now) => {
-    const progress = Math.min((now - start) / 1400, 1);
-    element.textContent = Math.round(
-      end * (1 - (1 - progress) ** 3),
-    ).toLocaleString("en-US");
-    return progress < 1;
-  });
 }
 
 function heroField() {
@@ -586,7 +604,7 @@ function observeOnce(elements, onEnter, options) {
 
 function pointerEffects() {
   // Pointer-relative parallax inside the product illustrations.
-  document.querySelectorAll(".ora-art, .safespend-art").forEach((area) => {
+  document.querySelectorAll(".ora-art, .vvollet-art").forEach((area) => {
     area.addEventListener("pointermove", (event) => {
       const rect = area.getBoundingClientRect();
       const nx = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -725,22 +743,6 @@ if (!reducedMotion.matches) {
   observeOnce(document.querySelectorAll(".split, .timeline-item"), null, {
     rootMargin: "0px 0px -12% 0px",
   });
-
-  const counters = [...document.querySelectorAll("[data-count]")];
-  counters.forEach((counter) => (counter.textContent = "0"));
-  observeOnce(
-    document.querySelectorAll(".safespend-art"),
-    (area) => area.querySelectorAll("[data-count]").forEach(countUp),
-    { threshold: 0.4 },
-  );
-  settlers.push(() =>
-    counters.forEach(
-      (counter) =>
-        (counter.textContent = Number(counter.dataset.count).toLocaleString(
-          "en-US",
-        )),
-    ),
-  );
 
   // Looping illustrations only animate while on screen.
   const loops = new IntersectionObserver((entries) =>

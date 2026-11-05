@@ -10,7 +10,7 @@ python -m http.server 8000
 
 Then visit `http://localhost:8000`.
 
-The four projects include accessible case-study dialogs: OraSight, SafeSpend, HR email automation at Yool Education, and a retail operations platform. Product visuals are illustrative; experience, technologies, education, and certifications are based on the supplied CV. The original portrait, downloadable CV, and social preview are in `assets/`.
+The four projects include accessible case-study dialogs: OraSight, VVollet, HR email automation at Yool Education, and a retail operations platform. Product visuals are illustrative; experience, technologies, education, and certifications are based on the supplied CV. The original portrait, downloadable CV, and social preview are in `assets/`.
 
 To update the site, edit content and links in `index.html`, visual styles in `styles.css`, and interactions in `script.js`.
 

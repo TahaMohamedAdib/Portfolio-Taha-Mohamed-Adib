@@ -839,158 +839,11 @@ h2 em {
   position: relative;
   overflow: hidden;
 }
-.safespend-art {
+.vvollet-art {
   background: #dce5d6;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.phone {
-  position: absolute;
-  top: 32px;
-  left: 15%;
-  width: 230px;
-  height: 435px;
-  border: 6px solid #273b2f;
-  border-radius: 32px;
-  background: #fbfcf5;
-  color: #21392b;
-  padding: 28px 15px 15px;
-  box-shadow: 12px 24px 30px #364d3c30;
-  transform: rotate(-9deg);
-  transition: transform 0.4s;
-}
-.project-card:hover .phone {
-  transform: rotate(-5deg) translateY(-5px);
-}
-.phone-island {
-  position: absolute;
-  top: 9px;
-  width: 58px;
-  height: 12px;
-  border-radius: 20px;
-  background: #273b2f;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.phone-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  background: #e4eadb;
-  border-radius: 50%;
-  font-size: 0.625rem;
-}
-.phone-label {
-  font: 0.375rem var(--mono);
-  margin-top: 22px;
-  color: #6b795f;
-}
-.phone-title {
-  font-size: 1.375rem;
-  line-height: 1.1;
-  letter-spacing: -0.05em;
-  margin-bottom: 18px;
-}
-.phone-title em {
-  font-size: 1.6875rem;
-}
-.balance {
-  background: #e7efdb;
-  padding: 14px 12px;
-  border-radius: 8px;
-}
-.balance > span {
-  font-size: 0.5rem;
-}
-.balance strong {
-  display: block;
-  font-size: 1.5625rem;
-  letter-spacing: -0.05em;
-  font-weight: 500;
-  margin: 5px 0 13px;
-}
-.balance small {
-  font-size: 0.5625rem;
-  font-weight: 400;
-}
-.budget-track {
-  height: 5px;
-  border-radius: 4px;
-  background: #cbd8bc;
-}
-.budget-track i {
-  display: block;
-  width: 60%;
-  height: 5px;
-  background: #456b3b;
-  border-radius: 4px;
-}
-.budget-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.4375rem;
-  margin-top: 7px;
-}
-.savings {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 18px;
-}
-.savings > span {
-  background: #e8ebda;
-  padding: 8px;
-  border-radius: 6px;
-}
-.savings strong,
-.savings small {
-  display: block;
-  font-size: 0.5rem;
-}
-.savings small {
-  color: #69775d;
-  font-size: 0.4375rem;
-  margin-top: 5px;
-}
-.phone-nav {
-  display: flex;
-  justify-content: space-around;
-  border-top: 1px solid #dbe0d1;
-  padding-top: 14px;
-  margin-top: 22px;
-  font-size: 0.875rem;
-}
-.floating-note {
-  position: absolute;
-  right: 6%;
-  top: 47%;
-  padding: 18px 20px;
-  background: #f8faef;
-  border: 1px solid #c4d0b9;
-  box-shadow: 0 8px 24px #3f563b0f;
-  border-radius: 3px;
-  transform: rotate(5deg);
-}
-.floating-note > span {
-  font: 0.4375rem var(--mono);
-  color: #5d754e;
-}
-.floating-note strong {
-  display: block;
-  font-size: 1.125rem;
-  line-height: 1.2;
-  letter-spacing: -0.05em;
-  margin-top: 10px;
-  font-weight: 500;
 }
 .visual-caption {
   position: absolute;
@@ -1830,16 +1683,6 @@ h2 em {
   .project-visual {
     height: 355px;
   }
-  .floating-note {
-    right: 4%;
-    padding: 14px;
-  }
-  .floating-note strong {
-    font-size: 1rem;
-  }
-  .phone {
-    left: 9%;
-  }
   .project-card-info {
     padding: 25px;
   }
@@ -2014,25 +1857,6 @@ h2 em {
     align-items: flex-start;
     flex-direction: column;
     gap: 8px;
-  }
-  .phone {
-    transform: rotate(-9deg) scale(0.85);
-    transform-origin: top left;
-    left: 12%;
-  }
-  .project-card:hover .phone {
-    transform: rotate(-5deg) scale(0.85);
-  }
-  .floating-note {
-    right: 5%;
-    top: 55%;
-    padding: 12px;
-  }
-  .floating-note strong {
-    font-size: 0.875rem;
-  }
-  .floating-note > span {
-    font-size: 0.375rem;
   }
   .automation-art {
     padding-inline: 18px;
@@ -2394,25 +2218,6 @@ h2 em {
   .project-visual {
     height: 350px;
   }
-  .phone {
-    transform: rotate(-9deg);
-    left: 12%;
-    top: 28px;
-  }
-  .project-card:hover .phone {
-    transform: rotate(-5deg);
-  }
-  .floating-note {
-    right: 6%;
-    top: 48%;
-    padding: 15px;
-  }
-  .floating-note strong {
-    font-size: 1.0625rem;
-  }
-  .floating-note > span {
-    font-size: 0.4375rem;
-  }
   .project-heading {
     flex-direction: row;
     align-items: center;
@@ -2757,12 +2562,6 @@ h2 em {
   }
   .project-card-info {
     padding: 22px;
-  }
-  .phone {
-    left: 8%;
-  }
-  .floating-note {
-    right: 3%;
   }
   .contact-email {
     gap: 10px;
@@ -3254,29 +3053,6 @@ body.modal-open .cursor {
 .chart > span:hover::after {
   opacity: 1;
   translate: -50% 0;
-}
-
-/* SafeSpend: parallax phone + filling budget */
-.motion-ready .phone {
-  translate: calc(var(--px, 0) * 10px) calc(var(--py, 0) * 10px);
-  transition:
-    transform 0.4s,
-    translate 0.9s var(--ease-out);
-}
-.motion-ready .floating-note {
-  translate: calc(var(--px, 0) * -18px) calc(var(--py, 0) * -14px);
-  transition: translate 0.9s var(--ease-out);
-}
-.motion-ready .budget-track i {
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 1.4s var(--ease-out) 0.2s;
-}
-.motion-ready .in-view .budget-track i {
-  transform: none;
-}
-[data-count] {
-  font-variant-numeric: tabular-nums;
 }
 
 /* Automation: signals flowing through the pipeline */
@@ -3780,34 +3556,13 @@ a:focus-visible {
   color: #7e88a3;
 }
 
-/* SafeSpend: the phone screen stays light, the stage goes dark */
-.safespend-art {
+/* VVollet: real screenshots on a dark green stage */
+.vvollet-art {
   background:
     radial-gradient(circle at 35% 35%, #1f5a3d88, transparent 60%),
     #08110d;
 }
-.phone {
-  border-color: #1b1f1d;
-  box-shadow:
-    0 0 0 1px #ffffff1a,
-    0 40px 70px -20px #000,
-    0 0 70px -20px #3ddc8466;
-}
-.phone-island {
-  background: #1b1f1d;
-}
-.floating-note {
-  background: #0d1712d9;
-  border-color: #3ddc8433;
-  color: #e7f5ec;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 20px 40px -10px #000;
-}
-.floating-note > span {
-  color: #7fd6a4;
-}
-.safespend-art .visual-caption {
+.vvollet-art .visual-caption {
   background: #08110dd9;
   color: #7fd6a4;
 }
@@ -4016,4 +3771,182 @@ a:focus-visible {
 main {
   position: relative;
   z-index: 1;
+}
+
+/* VVollet: real app screenshots framed as phones */
+.app-shots {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+}
+.app-shot {
+  position: absolute;
+  top: 34px;
+  width: 196px;
+  height: auto;
+  border: 5px solid #16191a;
+  border-radius: 34px;
+  background: #1c1d1f;
+  box-shadow:
+    0 0 0 1px #ffffff1f,
+    0 40px 70px -20px #000;
+  transition:
+    transform 0.6s var(--ease-out),
+    translate 0.9s var(--ease-out),
+    filter 0.4s,
+    box-shadow 0.4s;
+}
+.app-shot-back {
+  left: 50%;
+  top: 62px;
+  width: 176px;
+  transform: rotate(8deg);
+  filter: brightness(0.7);
+}
+.app-shot-front {
+  left: 14%;
+  transform: rotate(-5deg);
+  box-shadow:
+    0 0 0 1px #ffffff1f,
+    0 40px 70px -20px #000,
+    0 0 70px -20px #3ddc8466;
+}
+.project-card:hover .app-shot-front {
+  transform: rotate(-3deg) translateY(-6px);
+}
+.project-card:hover .app-shot-back {
+  transform: rotate(11deg) translate(14px, -2px);
+  filter: brightness(0.85);
+}
+.motion-ready .app-shot-front {
+  translate: calc(var(--px, 0) * 10px) calc(var(--py, 0) * 10px);
+}
+.motion-ready .app-shot-back {
+  translate: calc(var(--px, 0) * -16px) calc(var(--py, 0) * -12px);
+}
+.vvollet-art {
+  transition: background 0.5s;
+}
+.vvollet-art[data-theme="light"] {
+  background:
+    radial-gradient(circle at 35% 35%, #ffffffd9, transparent 60%),
+    #cfe0d6;
+}
+.vvollet-art[data-theme="light"] .app-shot {
+  border-color: #e9ecee;
+  background: #f4f5f6;
+}
+.vvollet-art[data-theme="light"] .visual-caption {
+  background: #cfe0d6d9;
+  color: #1d5a3c;
+}
+.theme-switch {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px 0 10px;
+  border: 1px solid #ffffff26;
+  border-radius: 999px;
+  background: #08110dcc;
+  color: #e7f5ec;
+  font: 0.6875rem var(--mono);
+  backdrop-filter: blur(10px);
+  transition:
+    background 0.3s,
+    color 0.3s,
+    border-color 0.3s;
+}
+.theme-switch:hover {
+  border-color: #3ddc8488;
+}
+.theme-switch-track {
+  width: 30px;
+  height: 18px;
+  padding: 2px;
+  border-radius: 999px;
+  background: #ffffff26;
+  transition: background 0.3s;
+}
+.theme-switch-track i {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.3s var(--ease-out);
+}
+.theme-switch[aria-pressed="true"] {
+  background: #ffffffd9;
+  color: #0e2a1c;
+  border-color: #0e2a1c26;
+}
+.theme-switch[aria-pressed="true"] .theme-switch-track {
+  background: #12795a;
+}
+.theme-switch[aria-pressed="true"] .theme-switch-track i {
+  transform: translateX(12px);
+}
+
+/* Case study screenshot strip */
+.dialog-gallery {
+  display: flex;
+  gap: 14px;
+  margin: 0 -44px 10px;
+  padding: 4px 44px 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 44px;
+  overscroll-behavior-x: contain;
+}
+.dialog-gallery:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: -3px;
+}
+.dialog-gallery figure {
+  flex: 0 0 168px;
+  margin: 0;
+  scroll-snap-align: start;
+}
+.dialog-gallery img {
+  width: 100%;
+  height: auto;
+  border: 4px solid #16191a;
+  border-radius: 26px;
+  box-shadow: 0 0 0 1px #ffffff1f;
+}
+.dialog-gallery figcaption {
+  margin-top: 10px;
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+@media (max-width: 620px) {
+  .app-shot-front {
+    left: 10%;
+    width: 170px;
+  }
+  .app-shot-back {
+    width: 150px;
+  }
+  .theme-switch-label {
+    font-size: 0.625rem;
+  }
+  .dialog-gallery {
+    margin-inline: -23px;
+    padding-inline: 23px;
+    scroll-padding-inline: 23px;
+  }
+  .dialog-gallery figure {
+    flex-basis: 140px;
+  }
+}
+/* Keep the double V of the VVollet wordmark from fusing into a W. */
+#vvollet-title {
+  letter-spacing: 0.02em;
 }
